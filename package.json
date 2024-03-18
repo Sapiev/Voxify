@@ -1,0 +1,20 @@
+{
+  "name": "Voxify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^29.1.4"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "minecraft-launcher-core": "^3.18.1",
+    "msmc": "^5.0.4"
+  }
+}

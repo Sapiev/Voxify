@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxify</title>
+    <script defer src="renderer.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bootstrap-icons/font/bootstrap-icons.min.css">
+</head>
+
+<body class="custombg2">
+    <div style="display: flex; background-color: rgba(0,0,0,0.5);">
+        <nav class="glass" style="border-radius: 0;">
+            <div style="display: flex;">
+                <div><img id="headSlot" src="https://mc-heads.net/head/Notch/45" alt="Notch"></div>
+                <div style="padding-left: 10px;">
+                    <span style="font-weight:500; padding: auto 0;">
+                        <p style="color: #b9b9b9;">Logged in as</p>
+                        <p style="font-weight: bold; padding-top: 5px;" id="usernameSlot">- - -</p>
+                    </span>
+                </div>
+            </div>
+            <hr />
+
+            <div style="width: 100%;" class="flex-center">
+                <button id="logout" style="font-size: 0.9rem;">Logout</button>
+            </div>
+
+            <br />
+
+            <select id="versionSelect"></select>
+
+            <div style="width: 100%; position: absolute; bottom: 5px; flex-direction: column;" class="flex-center">
+
+                <button id="start" class="flex-center" style="font-size: 1.2rem; width: 95%;"><i
+                        style="font-size: 1.3rem;" class="bi bi-play"></i> Play
+
+                    <div id="progressBarParent"
+                        style="opacity: 0; transition: opacity 0.5s ease-in-out; position: absolute; bottom: -2px; width: 100%; height: 10px; border-radius: 15px; padding: 2px; margin-bottom: 5px;"
+                        class="flex-center">
+                        <div
+                            style="width: 90%; position: relative; border-radius: 15px; height: 5px;  background-color: #1f1f1f;">
+                            <div style="bottom: 0; left: 0; position: absolute; border-radius: 15px; height: 5px; background-color: #4e4e4e;"
+                                id="progressBar">
+                            </div>
+                        </div>
+                    </div>
+
+                </button>
+            </div>
+        </nav>
+        <main style="position: relative; width: 100%; height: 100vh;">
+        </main>
+    </div>
+</body>
+
+</html>
