@@ -19,6 +19,7 @@ async function getAppDataPath() {
 }
 
 async function launchMinecraft(event, version, nick) {
+    let username = store.get('username');
     let versions = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(res => res.json()).then(data => data.versions.filter(v => v.type === "release").map(v => v.id))
     if (!versions.includes(version)) {
         console.error(`Version ${version} not found in the list of releases`)
@@ -69,7 +70,7 @@ async function launchMinecraft(event, version, nick) {
                 }
             };
         }
-        console.log(`[VOXIFY] Launching Minecraft ${version} as ${nick}! Premium?: ${!store.get('offline')}`);
+        console.log(`[VOXIFY] Launching Minecraft ${version} as ${username}! Premium?: ${!store.get('offline')}`);
         launcher.launch(opts);
     } catch (e) { console.error(e) }
 }
@@ -104,7 +105,9 @@ app.whenReady().then(async () => {
         store.set('offline', true);
     });
     ipcMain.on('tryPremiumLogin', async () => {
-        authManager.launch("electron").then(async (xboxManager) => {
+        authManager.launch("electron", {
+            icon: 'img/logo-crop.png'
+        }).then(async (xboxManager) => {
             //Generate the Minecraft login token
             const token = await xboxManager.getMinecraft();
             store.set('token', token.mclc());

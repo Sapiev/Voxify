@@ -10,50 +10,67 @@
     <link rel="stylesheet" href="bootstrap-icons/font/bootstrap-icons.min.css">
 </head>
 
-<body class="custombg2">
-    <div style="display: flex; background-color: rgba(0,0,0,0.5);">
-        <nav class="glass" style="border-radius: 0;">
-            <div style="display: flex;">
-                <div><img id="headSlot" src="https://mc-heads.net/head/Notch/45" alt="Notch"></div>
-                <div style="padding-left: 10px;">
-                    <span style="font-weight:500; padding: auto 0;">
-                        <p style="color: #b9b9b9;">Logged in as</p>
-                        <p style="font-weight: bold; padding-top: 5px;" id="usernameSlot">- - -</p>
-                    </span>
+<body class="custombg">
+    <div
+        style="height: 100vh; display: flex; align-items: center; flex-direction: column; background-color: rgba(0,0,0,0.5);">
+        <nav class="flex-center" style="border-radius: 0; ">
+            <div style="background-color: #1d1d1d; border: 1px solid #2c2c2c; border-radius: 50%; width: 65px; height: 65px;"
+                class="flex-center">
+                <div class="hover-info">
+                    <div><img id="headSlot" src="https://mc-heads.net/head/Notch/45" alt="Notch"></div>
+                    <div class="hover-body">
+                        <span style="font-weight:500; padding: auto 0;">
+                            <p id="usernameSlot" style="color: #b9b9b9;">- - -</p>
+                        </span>
+                    </div>
                 </div>
             </div>
-            <hr />
+            <div
+                style="margin-left: 5px; background-color: #1d1d1d; border: 1px solid #2c2c2c; border-radius: 15px; width: 80%; height: 65px; display: flex; align-items: center; justify-content: space-evenly; padding: 5px 10px;">
 
-            <div style="width: 100%;" class="flex-center">
-                <button id="logout" style="font-size: 0.9rem;">Logout</button>
-            </div>
 
-            <br />
+                <button id="logout" class="icon"><i class="bi bi-box-arrow-left"></i></button>
 
-            <select id="versionSelect"></select>
 
-            <div style="width: 100%; position: absolute; bottom: 5px; flex-direction: column;" class="flex-center">
+                <button id="versionSelected" class="outline" style="width: 180px;">Select Version</button>
 
-                <button id="start" class="flex-center" style="font-size: 1.2rem; width: 95%;"><i
-                        style="font-size: 1.3rem;" class="bi bi-play"></i> Play
-
-                    <div id="progressBarParent"
-                        style="opacity: 0; transition: opacity 0.5s ease-in-out; position: absolute; bottom: -2px; width: 100%; height: 10px; border-radius: 15px; padding: 2px; margin-bottom: 5px;"
-                        class="flex-center">
-                        <div
-                            style="width: 90%; position: relative; border-radius: 15px; height: 5px;  background-color: #1f1f1f;">
-                            <div style="bottom: 0; left: 0; position: absolute; border-radius: 15px; height: 5px; background-color: #4e4e4e;"
-                                id="progressBar">
-                            </div>
-                        </div>
-                    </div>
-
-                </button>
+                <buton id="settings" class="icon"><i class="bi bi-gear-fill"></i></buton>
             </div>
         </nav>
-        <main style="position: relative; width: 100%; height: 100vh;">
+        <main style="position: relative; width: 80%; height: 90vh; margin-top: 20px;">
+            <div id="mainSettingContainer"
+                style="opacity: 0; transition: opacity 0.3s ease-in-out; display:none; background: #1d1d1d; border: 1px solid #2c2c2c; padding: 15px; border-radius: 15px; height: 85%;">
+                <div id="versionSelect" class="flex-center"
+                    style="position: relative; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; display:none;">
+                    <h2 style="color: #b9b9b9;">Select Version</h2>
+                    <div id="versionSelectList" class="flex-center"
+                        style="flex-wrap: wrap; overflow: hidden; overflow-y: scroll; height: 60vh;">
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
+
+    <footer>
+        <div style="width: 100%; position: relative; flex-direction: column;" class="flex-center">
+
+            <button id="start" class="flex-center" style="font-size: 1.2rem; width: 155px;"><i
+                    style="font-size: 1.3rem;" class="bi bi-play"></i> Play
+
+                <div id="progressBarParent"
+                    style="display: none; opacity: 0; transition: opacity 0.5s ease-in-out; position: absolute; bottom: -2px; width: 100%; height: 10px; border-radius: 15px; padding: 2px; margin-bottom: 5px;"
+                    class="flex-center">
+                    <div
+                        style="width: 90%; position: relative; border-radius: 15px; height: 5px;  background-color: #1f1f1f;">
+                        <div style="bottom: 0; left: 0; position: absolute; border-radius: 15px; height: 5px; background-color: #4e4e4e;"
+                            id="progressBar">
+                        </div>
+                    </div>
+                </div>
+
+            </button>
+        </div>
+    </footer>
 </body>
 
 </html>
