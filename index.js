@@ -38,6 +38,10 @@ async function launchMinecraft(event, version, mctype) {
         console.error(`Nick ${username} doesn't meet the criteria`)
         return
     }
+    var fabricVersion;
+    if (mctype == "Fabric") {
+        fabricVersion = await installFabricLoader(version, `${await getAppDataPath()}/.minecraft`);
+    }
     try {
         let opts;
         if (store.get('offline')) {
@@ -63,8 +67,6 @@ async function launchMinecraft(event, version, mctype) {
                     "-Dminecraft.api.services.host=https://nope.invalid"]
             }
         } else {
-            let fabricVersion = await installFabricLoader(version, `${await getAppDataPath()}/.minecraft`);
-
             opts = {
                 authorization: await store.get('token'),
                 root: `${await getAppDataPath()}/.minecraft`,
