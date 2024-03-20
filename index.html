@@ -11,6 +11,18 @@
 </head>
 
 <body class="custombg">
+    <div class="menu-bar">
+        <div style="width: 100%;">
+            <img src="img/logo.png">
+            Voxify
+            <span id="productVersion" style="font-size: 0.6rem; margin-left: 10px;">---</span>
+        </div>
+        <div>
+            <button id="minimize" class="icon pointer"><i class="bi bi-dash"></i></button>
+            <button id="maximize" class="icon pointer"><i class="bi bi-square"></i></button>
+            <button id="close" class="icon pointer"><i style="font-size: 1rem;" class="bi bi-x"></i></button>
+        </div>
+    </div>
     <div
         style="height: 100vh; display: flex; align-items: center; flex-direction: column; background-color: rgba(0,0,0,0.5);">
         <nav class="flex-center" style="border-radius: 0; ">
@@ -29,12 +41,15 @@
                 style="margin-left: 5px; background-color: #1d1d1d; border: 1px solid #2c2c2c; border-radius: 15px; width: 80%; height: 65px; display: flex; align-items: center; justify-content: space-evenly; padding: 5px 10px;">
 
 
-                <button id="logout" class="icon"><i class="bi bi-box-arrow-left"></i></button>
+                <button id="logout" class="icon pointer"><i class="bi bi-box-arrow-left"></i></button>
 
 
-                <button id="versionSelected" class="outline" style="width: 180px;">Select Version</button>
+                <button id="start" class="color" style="width: 180px;"><i class="bi bi-play-fill"></i>
+                    Select
+                    Version</button>
 
-                <buton id="settings" class="icon"><i class="bi bi-gear-fill"></i></buton>
+                <button id="versionSelected" class="icon pointer"><i class="bi bi-gear"></i>
+                </button>
             </div>
         </nav>
         <main style="position: relative; width: 80%; height: 90vh; margin-top: 20px;">
@@ -43,8 +58,15 @@
                 <div id="versionSelect" class="flex-center"
                     style="position: relative; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; display:none;">
                     <h2 style="color: #b9b9b9;">Select Version</h2>
+                    <div class="flex-center" style="text-align: center; margin: 3px 0;">
+                        <button id="backMinecraftType" class="icon pointer"><i style="font-size: 0.9rem;"
+                                class="bi bi-arrow-left-circle"></i></button>
+                        <p id="minecraftType" style="color: #b9b9b9; font-size: 1.2rem; width: 90px;">Vanilla</p>
+                        <button id="nextMinecraftType" class="icon pointer"><i style="font-size: 0.9rem;"
+                                class="bi bi-arrow-right-circle"></i></button>
+                    </div>
                     <div id="versionSelectList" class="flex-center"
-                        style="flex-wrap: wrap; overflow: hidden; overflow-y: scroll; height: 60vh;">
+                        style="flex-wrap: wrap; overflow: hidden; overflow-y: scroll; height: 50vh;">
                     </div>
                 </div>
             </div>
@@ -54,7 +76,7 @@
     <footer>
         <div style="width: 100%; position: relative; flex-direction: column;" class="flex-center">
 
-            <button id="start" class="flex-center" style="font-size: 1.2rem; width: 155px;"><i
+            <!-- <button id="start" class="flex-center" style="font-size: 1.2rem; width: 155px;"><i
                     style="font-size: 1.3rem;" class="bi bi-play"></i> Play
 
                 <div id="progressBarParent"
@@ -68,7 +90,7 @@
                     </div>
                 </div>
 
-            </button>
+            </button> -->
         </div>
     </footer>
 </body>

@@ -5,18 +5,55 @@
 }
 
 .custombg {
-    background-image: url('img/bg2.png');
+    background-image: url('img/bg.png');
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #131314;
     color: white;
     height: 100vh;
     overflow: hidden;
+}
+
+.menu-bar {
+    width: 100vw;
+    height: 30px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #131313;
+    overflow: hidden;
+    color: #adadad;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.menu-bar>div:first-child {
+    -webkit-app-region: drag;
+}
+
+.menu-bar img {
+    width: 30px;
+    height: 30px;
+}
+
+.menu-bar>div {
+    display: flex;
+    align-items: center;
+}
+
+.menu-bar>div>button {
+    cursor: pointer;
+}
+
+.menu-bar>div>button>i {
+    color: #adadad;
+    font-size: 0.8rem;
 }
 
 .container-center {
@@ -62,12 +99,30 @@ button {
     align-items: center;
 }
 
+button.color {
+    /* Gradient Color */
+    background: linear-gradient(90deg, #2a7fe0, #5d30ff);
+    font-weight: 600;
+}
+
 button.icon {
     padding: 3px;
     background-color: transparent;
     margin: 0 5px;
     font-size: 1.2rem;
     border: none;
+}
+
+button.icon>* {
+    transition: color 0.2s ease-in-out;
+}
+
+button.pointer {
+    cursor: pointer;
+}
+
+button.pointer:hover>* {
+    color: #adadad;
 }
 
 button.outline {

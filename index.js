@@ -5,6 +5,8 @@ const store = new Store();
 const { Client, Authenticator } = require('minecraft-launcher-core');
 const { Auth } = require("msmc");
 const launcher = new Client();
+const xmcl = require("@xmcl/installer");
+const xmclCore = require("@xmcl/core");
 
 const authManager = new Auth("select_account");
 
@@ -18,16 +20,22 @@ async function getAppDataPath() {
     }
 }
 
-async function launchMinecraft(event, version, nick) {
+async function installFabricLoader(version, path) {
+    const fabricVersionList = await xmcl.getFabricLoaderArtifact(version, '0.15.7');
+    const fabricVersion = await xmcl.installFabric(fabricVersionList, path);
+    return fabricVersion;
+}
+
+async function launchMinecraft(event, version, mctype) {
     let username = store.get('username');
-    let versions = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(res => res.json()).then(data => data.versions.filter(v => v.type === "release").map(v => v.id))
+    const versions = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(res => res.json()).then(data => data.versions.filter(v => v.type === "release").map(v => v.id))
     if (!versions.includes(version)) {
         console.error(`Version ${version} not found in the list of releases`)
         return
     }
 
-    if (nick.length < 3 || nick.length > 16 || !/^[a-zA-Z0-9_]+$/.test(nick)) {
-        console.error(`Nick ${nick} doesn't meet the criteria`)
+    if (username.length < 3 || username.length > 16 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+        console.error(`Nick ${username} doesn't meet the criteria`)
         return
     }
     try {
@@ -39,6 +47,7 @@ async function launchMinecraft(event, version, nick) {
                 version: {
                     number: version,
                     type: "release",
+                    custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
                 memory: {
                     max: "6G",
@@ -54,15 +63,18 @@ async function launchMinecraft(event, version, nick) {
                     "-Dminecraft.api.services.host=https://nope.invalid"]
             }
         } else {
+            let fabricVersion = await installFabricLoader(version, `${await getAppDataPath()}/.minecraft`);
+
             opts = {
                 authorization: await store.get('token'),
                 root: `${await getAppDataPath()}/.minecraft`,
                 version: {
                     number: version,
                     type: "release",
+                    custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
                 memory: {
-                    max: "6G",
+                    max: "8G",
                     min: "4G",
                 },
                 overrides: {
@@ -80,9 +92,11 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+            devTools: false
         },
-        icon: 'img/logo-crop.png'
+        icon: 'img/logo-crop.png',
+        frame: false
     })
 
     launcher.on('progress', (e) => {
@@ -124,6 +138,10 @@ app.whenReady().then(async () => {
         store.delete('username');
         win.loadFile('login.html');
     });
+
+    ipcMain.on('minimize', () => win.minimize());
+    ipcMain.on('maximize', () => win.isMaximized() ? win.unmaximize() : win.maximize());
+    ipcMain.on('close', () => win.close());
 
     ipcMain.handle('getUsername', async () => { return store.get('username') });
 
