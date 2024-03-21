@@ -36,6 +36,7 @@
   "dependencies": {
     "@xmcl/core": "^2.13.0",
     "@xmcl/installer": "^5.4.0",
+    "conf": "^12.0.0",
     "electron-store": "^8.2.0",
     "minecraft-launcher-core": "^3.18.1",
     "msmc": "^5.0.4"
