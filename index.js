@@ -8,6 +8,12 @@ const launcher = new Client();
 const xmcl = require("@xmcl/installer");
 const xmclCore = require("@xmcl/core");
 
+const { autoUpdater, AppUpdater } = require("electron-updater")
+
+// Auto updater flags
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
 const authManager = new Auth("select_account");
 
 async function getAppDataPath() {
@@ -89,6 +95,24 @@ async function launchMinecraft(event, version, mctype) {
     } catch (e) { console.error(e) }
 }
 
+function createUpdater() {
+    const win = new BrowserWindow({
+        width: 220,
+        height: 300,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            devTools: true
+        },
+        resizable: true,
+        icon: 'img/logo-crop.png',
+        frame: false
+    })
+
+    win.loadFile('updater.html');
+
+    return win;
+}
+
 function createWindow() {
     const win = new BrowserWindow({
         width: 800,
@@ -113,7 +137,48 @@ function createWindow() {
     return win;
 }
 
+async function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 app.whenReady().then(async () => {
+    let updater = createUpdater();
+
+    autoUpdater.on('update-available', () => {
+        updater.webContents.send('updateProcess', 'Update available! Downloading...');
+        autoUpdater.downloadUpdate();
+    });
+    autoUpdater.on('update-not-available', async () => {
+        console.log('Update not avaible'); updater.webContents.send('updateProcess', 'No updates available.');
+        await wait(2000);
+        updater.close();
+    });
+    autoUpdater.on('download-progress', (progress) => {
+        updater.webContents.send('updateProcess', `Downloading... ${progress.percent}%`)
+    });
+    autoUpdater.on('update-downloaded', async () => {
+        updater.webContents.send('updateProcess', 'Update downloaded!');
+        await wait(2000);
+        updater.close();
+    });
+    autoUpdater.on('error', async (err) => {
+        updater.webContents.send('updateProcess', 'Error updating');
+        await wait(2000);
+        updater.close();
+    });
+    try {
+        let updater = await autoUpdater.checkForUpdates();
+        if (!updater) {
+            await wait(2000);
+            updater.close();
+        }
+    } catch (e) {
+        console.log('Error checking for updates');
+        updater.webContents.send('updateProcess', 'Error checking for updates ' + e);
+        await wait(2000);
+        updater.close();
+    }
+
     const win = createWindow();
     ipcMain.on('launchMinecraft', launchMinecraft);
     ipcMain.on('offlineLogin', (event, username) => {
@@ -157,7 +222,17 @@ app.whenReady().then(async () => {
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow()
+            let updater = createUpdater();
+            autoUpdater.on('update-not-available', async () => {
+                await wait(2000);
+                updater.close();
+                createWindow();
+            });
+            autoUpdater.on('update-downloaded', async () => {
+                await wait(2000);
+                updater.close();
+                createWindow();
+            });
         }
     })
 })
