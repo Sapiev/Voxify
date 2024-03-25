@@ -3,12 +3,7 @@ let username;
 const versionSelected = document.getElementById('versionSelected');
 const setButton = document.getElementById('start')
 const logoutBtn = document.getElementById('logout');
-const versionSelectList = document.getElementById('versionSelectList');
-const versionSelect = document.getElementById('versionSelect');
 const mainSettingContainer = document.getElementById('mainSettingContainer');
-const backMinecraftType = document.getElementById('backMinecraftType');
-const nextMinecraftType = document.getElementById('nextMinecraftType');
-const minecraftType = document.getElementById('minecraftType');
 const chooseProfile = document.getElementById('chooseProfile');
 const createProfile = document.getElementById('createProfile');
 
@@ -41,32 +36,6 @@ async function toggleElement(element, forceShow = null) {
         element.style.display = "none";
     }
 }
-
-versionSelected.addEventListener('click', () => {
-    toggleElement(versionSelect);
-});
-
-backMinecraftType.addEventListener('click', () => {
-    let index = minecraftTypeList.indexOf(minecraftType.innerText);
-    if (index <= 0) {
-        index = minecraftTypeList.length - 1;
-    } else {
-        index--;
-    }
-    minecraftType.innerText = minecraftTypeList[index];
-
-});
-
-nextMinecraftType.addEventListener('click', () => {
-    let index = minecraftTypeList.indexOf(minecraftType.innerText);
-    if (index >= minecraftTypeList.length - 1) {
-        index = 0;
-    } else {
-        index++;
-    }
-    minecraftType.innerText = minecraftTypeList[index];
-
-});
 
 async function load() {
     refrehsProfileList()
