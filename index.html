@@ -11,6 +11,11 @@
 </head>
 
 <body class="custombg">
+    <div id="rightClickMenu">
+        <div id="rcmModify" class="item"><i class="bi bi-pencil"></i> Modify</div>
+        <div id="rcmDelete" class="item"><i class="bi bi-trash3"></i> Delete</div>
+    </div>
+
     <div class="menu-bar">
         <div style="width: 100%;">
             <img src="img/logo.png">
@@ -46,7 +51,7 @@
 
                 <button id="start" class="color" style="width: 180px;"><i class="bi bi-play-fill"></i>
                     Select
-                    Version</button>
+                    Profile</button>
 
                 <button id="versionSelected" class="icon pointer"><i class="bi bi-gear"></i>
                 </button>
@@ -54,7 +59,7 @@
         </nav>
         <main style="position: relative; width: 80%; height: 90vh; margin-top: 20px;">
             <div id="mainSettingContainer"
-                style="opacity: 0; transition: opacity 0.3s ease-in-out; display:none; background: #1d1d1d; border: 1px solid #2c2c2c; padding: 15px; border-radius: 15px; height: 85%;">
+                style=" transition: opacity 0.3s ease-in-out; background: #1d1d1d; border: 1px solid #2c2c2c; padding: 15px; border-radius: 15px; height: 85%;">
                 <div id="versionSelect" class="flex-center"
                     style="position: relative; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; display:none;">
                     <h2 style="color: #b9b9b9;">Select Version</h2>
@@ -67,6 +72,16 @@
                     </div>
                     <div id="versionSelectList" class="flex-center"
                         style="flex-wrap: wrap; overflow: hidden; overflow-y: scroll; height: 50vh;">
+                    </div>
+                </div>
+
+                <div id="profileList" class="flex-center" style="flex-direction: column;">
+                    <h2 style="color: #b9b9b9;">Profiles</h2>
+                    <button id="createProfile" class="color" style="margin: 15px 0;">Create Profile</button>
+                    <div id="profileListDiv" style="width: 100%; display: grid; grid-template-columns: repeat(4, 1fr);">
+                        <button class="profile">
+                            <p>MC</p>
+                        </button>
                     </div>
                 </div>
             </div>

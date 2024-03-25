@@ -3,12 +3,18 @@ const APP_VERSION = "Beta 0.1.2";
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    launchMinecraft: (version, mctype) => ipcRenderer.send('launchMinecraft', version, mctype),
+    launchMinecraft: (profile) => ipcRenderer.send('launchMinecraft', profile),
     offlineLogin: (username) => ipcRenderer.send('offlineLogin', username),
     tryPremiumLogin: () => ipcRenderer.send('tryPremiumLogin'),
     logout: () => ipcRenderer.send('logout'),
     getUsername: async () => await ipcRenderer.invoke('getUsername'),
-    updateProcess: (callback) => ipcRenderer.on('updateProcess', (_event, info) => callback(info))
+    updateProcess: (callback) => ipcRenderer.on('updateProcess', (_event, info) => callback(info)),
+    updateProfileList: (callback) => ipcRenderer.on('updateProfileList', (_event) => callback()),
+    modyfyingProfile: (callback) => ipcRenderer.on('modyfyingProfile', (_event, name, mcversion, mctype) => callback(name, mcversion, mctype)),
+    openProfileWindow: (modify, name) => ipcRenderer.send('openProfileWindow', modify, name),
+    createUpdateProfile: (name, mcversion, mctype, newname) => ipcRenderer.send('createUpdateProfile', name, mcversion, mctype, newname),
+    deleteProfile: (name) => ipcRenderer.send('deleteProfile', name),
+    getProfileList: async () => await ipcRenderer.invoke('getProfileList')
 })
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -22,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         minimize.addEventListener('click', () => ipcRenderer.send('minimize'));
         maximize.addEventListener('click', () => ipcRenderer.send('maximize'));
-        close.addEventListener('click', () => ipcRenderer.send('close'));
+        close.addEventListener('click', () => ipcRenderer.send('close', window.location.href));
 
     } catch (e) {
         console.log('Navbar not detected')

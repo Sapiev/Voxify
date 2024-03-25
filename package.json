@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "nodemon --exec electron .",
     "build": "electron-builder"
   },
   "repository": "https://github.com/Sapiev/Voxify",
@@ -44,6 +44,7 @@
     "conf": "^12.0.0",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.1.8",
+    "install": "^0.13.0",
     "minecraft-launcher-core": "^3.18.1",
     "msmc": "^5.0.4"
   }

@@ -68,7 +68,7 @@ body {
     background: #57575733;
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    border-radius: 15px;
+    border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.18);
 }
 
@@ -79,17 +79,18 @@ body {
 }
 
 input[type="text"] {
+    color: white;
+    background-color: #57575733;
     padding: 10px 20px;
     border: none;
-    border-radius: 15px;
-    margin-bottom: 20px;
+    border-radius: 10px;
 }
 
 button {
     font-size: 1rem;
     padding: 10px 20px;
     border: none;
-    border-radius: 15px;
+    border-radius: 10px;
     cursor: pointer;
     background-color: #2c2c2c;
     border: 2px solid #3a3a3a;
@@ -158,9 +159,35 @@ select {
     width: 95%;
     padding: 5px 10px;
     border: none;
-    border-radius: 15px;
+    border-radius: 10px;
     margin: 0 10px;
 }
+
+select>option {
+    background-color: rgb(46, 46, 46);
+    color: white;
+}
+
+/* width */
+select::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+select::-webkit-scrollbar-track {
+    background: rgb(46, 46, 46);
+}
+
+/* Handle */
+select::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+select::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 
 footer {
     position: absolute;
@@ -188,8 +215,9 @@ footer {
 .hover-info:hover>.hover-body {
     bottom: -40px;
     opacity: 1;
+    z-index: 1000;
     background-color: #1d1d1d;
-    border-radius: 15px;
+    border-radius: 10px;
     padding: 5px 10px;
 }
 
@@ -210,4 +238,46 @@ main>*::-webkit-scrollbar-thumb {
     background-color: #ffffff00;
     border-radius: 10px;
     border: 3px solid #ffffff00;
+}
+
+.profile {
+    width: 150px;
+    margin: 5px 2px;
+}
+
+.profile>p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#rightClickMenu {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-radius: 10px;
+    min-width: 100px;
+    background-color: #1d1b1b;
+    padding: 8px 10px;
+
+    transform: scale(0);
+    transform-origin: top left;
+}
+
+#rightClickMenu.active {
+    transform: scale(1);
+    transition: transform 0.2s ease-in-out;
+}
+
+#rightClickMenu>.item>i {
+    float: left;
+    margin-right: 5px;
+}
+
+#rightClickMenu>.item {
+    text-align: start;
+    cursor: pointer;
+    padding: 5px 0;
 }

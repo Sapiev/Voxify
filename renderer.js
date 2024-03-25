@@ -9,6 +9,8 @@ const mainSettingContainer = document.getElementById('mainSettingContainer');
 const backMinecraftType = document.getElementById('backMinecraftType');
 const nextMinecraftType = document.getElementById('nextMinecraftType');
 const minecraftType = document.getElementById('minecraftType');
+const chooseProfile = document.getElementById('chooseProfile');
+const createProfile = document.getElementById('createProfile');
 
 const minecraftTypeList = ['Vanilla', 'Fabric'];
 
@@ -17,7 +19,7 @@ let selectedVersion = null;
 setButton.addEventListener('click', () => {
     //const progressBarParent = document.getElementById('progressBarParent');
     //progressBarParent.style.opacity = 1;
-    window.electronAPI.launchMinecraft(selectedVersion, minecraftType.innerText);
+    window.electronAPI.launchMinecraft(selectedVersion);
 })
 
 logoutBtn.addEventListener('click', () => {
@@ -42,7 +44,6 @@ async function toggleElement(element, forceShow = null) {
 
 versionSelected.addEventListener('click', () => {
     toggleElement(versionSelect);
-    toggleElement(mainSettingContainer);
 });
 
 backMinecraftType.addEventListener('click', () => {
@@ -53,7 +54,7 @@ backMinecraftType.addEventListener('click', () => {
         index--;
     }
     minecraftType.innerText = minecraftTypeList[index];
-    refreshAvaibleVersions(minecraftTypeList[index]);
+
 });
 
 nextMinecraftType.addEventListener('click', () => {
@@ -64,11 +65,11 @@ nextMinecraftType.addEventListener('click', () => {
         index++;
     }
     minecraftType.innerText = minecraftTypeList[index];
-    refreshAvaibleVersions(minecraftTypeList[index]);
+
 });
 
 async function load() {
-    refreshAvaibleVersions();
+    refrehsProfileList()
 
     const usernameSlot = document.getElementById('usernameSlot');
     const headSlot = document.getElementById('headSlot');
@@ -80,26 +81,54 @@ async function load() {
     });
 }
 
-async function refreshAvaibleVersions(minecraftType = 'Vanilla') {
-    versionSelectList.innerHTML = '';
-    let versions = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(res => res.json()).then(data => data.versions.filter(v => v.type === "release").map(v => v.id));
+let selectedProfile = null;
 
-    versions.every(version => {
-        console.log(version)
-        if (minecraftType === 'Fabric' && version == '1.13.2') return false;
-        const listItem = document.createElement('button');
-        listItem.classList.add('outline');
-        listItem.style.margin = "5px";
-        listItem.innerText = version;
-        versionSelectList.appendChild(listItem);
-        listItem.addEventListener('click', () => {
-            setButton.innerHTML = '<i class="bi bi-play-fill"></i> Launch ' + version;
-            selectedVersion = version;
-            toggleElement(versionSelect, false);
-            toggleElement(mainSettingContainer, false);
+const rcmModify = document.getElementById('rcmModify');
+const rcmDelete = document.getElementById('rcmDelete');
+
+async function refrehsProfileList() {
+    const rightClickMenu = document.getElementById('rightClickMenu');
+
+    const profileListDiv = document.getElementById('profileListDiv');
+    window.electronAPI.getProfileList().then((profiles) => {
+        profileListDiv.innerHTML = '';
+        profiles.forEach(profile => {
+            const listItem = document.createElement('button');
+            listItem.classList.add('profile');
+            listItem.innerText = profile;
+            listItem.addEventListener('click', () => {
+                selectedVersion = profile;
+                setButton.innerHTML = '<i class="bi bi-play-fill"></i> ' + profile;
+            });
+            listItem.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                rightClickMenu.style.top = e.y + 'px';
+                rightClickMenu.style.left = e.x + 'px';
+                rightClickMenu.classList.add('active');
+                selectedProfile = profile;
+            });
+            profileListDiv.appendChild(listItem);
         });
-        return true;
+    });
+    window.addEventListener('click', (e) => {
+        e.preventDefault();
+        rightClickMenu.classList.remove('active');
     });
 }
+
+rcmDelete.addEventListener('click', () => {
+    window.electronAPI.deleteProfile(selectedProfile);
+    refrehsProfileList();
+});
+
+rcmModify.addEventListener('click', () => {
+    window.electronAPI.openProfileWindow(true, selectedProfile);
+});
+
+createProfile.addEventListener('click', () => {
+    window.electronAPI.openProfileWindow(false, '');
+});
+
+window.electronAPI.updateProfileList(() => refrehsProfileList());
 
 load();

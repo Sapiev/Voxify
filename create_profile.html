@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="create_profile.js"></script>
+    <link rel="stylesheet" href="bootstrap-icons/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <div class="menu-bar">
+        <div style="width: 100%;">
+            <img src="img/logo.png">
+            Voxify
+            <span id="productVersion" style="font-size: 0.6rem; margin-left: 10px;">---</span>
+        </div>
+        <div>
+            <button id="minimize" class="icon pointer"><i class="bi bi-dash"></i></button>
+            <button id="maximize" class="icon pointer"><i class="bi bi-square"></i></button>
+            <button id="close" class="icon pointer"><i style="font-size: 1rem;" class="bi bi-x"></i></button>
+        </div>
+    </div>
+    <div class="flex-center" style="flex-direction: column;">
+        <h1 id="title">Create Profile</h1>
+        <div class="flex-center" style="flex-direction: column; align-items: start;">
+            <div class="flex-center" style="margin: 5px 0;">
+                <p>Name: &nbsp;</p>
+                <input type="text" id="profilename" placeholder="Profile Name">
+            </div>
+            <div class="flex-center" style="margin: 5px 0;">
+                <p>Type: &nbsp;</p>
+                <label style="margin: 0 2px;">
+                    <input checked value="Vanilla" type="radio" id="vanillaType" name="mctype" placeholder="Vanilla"
+                        onchange="refreshAvaibleVersions()">
+                    Vanilla
+                </label>
+                <label style="margin: 0 2px;">
+                    <input value="Fabric" type="radio" id="fabricType" name="mctype" placeholder="Fabric"
+                        onchange="refreshAvaibleVersions('Fabric')">
+                    Fabric
+                </label>
+            </div>
+            <div class="flex-center" style="margin: 5px 0;">
+                <p>Version: &nbsp;</p>
+                <select style="width: 120px;" id="versionSelectList">
+                    <option value="1.16.5">1.16.5</option>
+                    <option value="1.17">1.17</option>
+                    <option value="1.17.1">1.17.1</option>
+                    <option value="1.17.2">1.17.2</option>
+                    <option value="1.17.3">1.17.3</option>
+                    <option value="1.17.4">1.17.4</option>
+                    <option value="1.17.5">1.17.5</option>
+                </select>
+            </div>
+        </div>
+        <button id="createProfile" class="color" style="margin: 15px 0;">Create Profile</button>
+    </div>
+</body>
+
+</html>

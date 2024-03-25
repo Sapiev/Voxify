@@ -7,6 +7,7 @@ const { Auth } = require("msmc");
 const launcher = new Client();
 const xmcl = require("@xmcl/installer");
 const xmclCore = require("@xmcl/core");
+const fs = require('fs');
 
 const { autoUpdater, AppUpdater } = require("electron-updater")
 
@@ -32,11 +33,18 @@ async function installFabricLoader(version, path) {
     return fabricVersion;
 }
 
-async function launchMinecraft(event, version, mctype) {
+async function launchMinecraft(event, profile) {
+    const profilePath = `${await getAppDataPath()}/.minecraft/Voxify/profiles/${profile}`;
+    if (!fs.existsSync(profilePath)) return console.error('Profile not found');
+
+    const filePath = `${profilePath}/profile.json`;
+    const data = fs.readFileSync(filePath);
+    const { name, mcversion, mctype } = JSON.parse(data);
+
     let username = store.get('username');
     const versions = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(res => res.json()).then(data => data.versions.filter(v => v.type === "release").map(v => v.id))
-    if (!versions.includes(version)) {
-        console.error(`Version ${version} not found in the list of releases`)
+    if (!versions.includes(mcversion)) {
+        console.error(`Version ${mcversion} not found in the list of releases`)
         return
     }
 
@@ -46,16 +54,16 @@ async function launchMinecraft(event, version, mctype) {
     }
     var fabricVersion;
     if (mctype == "Fabric") {
-        fabricVersion = await installFabricLoader(version, `${await getAppDataPath()}/.minecraft`);
+        fabricVersion = await installFabricLoader(mcversion, `${await getAppDataPath()}/.minecraft`);
     }
     try {
         let opts;
         if (store.get('offline')) {
             opts = {
                 authorization: Authenticator.getAuth(store.get('username')),
-                root: `${await getAppDataPath()}/.minecraft`,
+                root: `${profilePath}/.minecraft`,
                 version: {
-                    number: version,
+                    number: mcversion,
                     type: "release",
                     custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
@@ -75,9 +83,9 @@ async function launchMinecraft(event, version, mctype) {
         } else {
             opts = {
                 authorization: await store.get('token'),
-                root: `${await getAppDataPath()}/.minecraft`,
+                root: `${profilePath}/.minecraft`,
                 version: {
-                    number: version,
+                    number: mcversion,
                     type: "release",
                     custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
@@ -90,10 +98,83 @@ async function launchMinecraft(event, version, mctype) {
                 }
             };
         }
-        console.log(`[VOXIFY] Launching Minecraft ${version} as ${username}! Premium?: ${!store.get('offline')}`);
+        console.log(`[VOXIFY] Launching Minecraft ${mcversion} as ${username}! Premium?: ${!store.get('offline')}`);
         launcher.launch(opts);
     } catch (e) { console.error(e) }
 }
+
+async function createProfileWindow(modify, name) {
+    console.log(`Creating profile window, modify: ${modify}, name: ${name}`)
+    const win = new BrowserWindow({
+        width: 400,
+        height: 270,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            devTools: true
+        },
+        icon: 'img/logo-crop.png',
+        frame: false,
+        resizable: false
+    })
+    win.loadFile('create_profile.html');
+
+    ipcMain.on('close', (event, windowLocation) => {
+        if (windowLocation.includes('create_profile.html')) {
+            win.destroy();
+        }
+    });
+    ipcMain.on('createUpdateProfile', () => { win.destroy(); });
+
+    if (modify) {
+        const profilePath = `${await getAppDataPath()}/.minecraft/Voxify/profiles/${name}`;
+        if (!fs.existsSync(profilePath)) return console.error('Profile not found');
+
+        const filePath = `${profilePath}/profile.json`;
+        const data = fs.readFileSync(filePath);
+        const { mcversion, mctype } = JSON.parse(data);
+
+        win.on('ready-to-show', () => {
+            win.webContents.send('modyfyingProfile', name, mcversion, mctype);
+        })
+    }
+
+    return win;
+}
+
+async function createUpdateProfile(name, mcversion, mctype, newname = name) {
+    let profilePath = `${await getAppDataPath()}/.minecraft/Voxify/profiles/${name}`;
+    if (!fs.existsSync(profilePath)) fs.mkdirSync(profilePath, { recursive: true });
+
+    if (newname !== name) {
+        fs.renameSync(`${await getAppDataPath()}/.minecraft/Voxify/profiles/${name}`, `${await getAppDataPath()}/.minecraft/Voxify/profiles/${newname}`);
+        profilePath = `${await getAppDataPath()}/.minecraft/Voxify/profiles/${newname}`;
+    }
+
+    const filePath = `${profilePath}/profile.json`;
+    const data = JSON.stringify({ name: newname, mcversion: mcversion, mctype: mctype });
+
+    fs.writeFile(filePath, data, (err) => {
+        if (err) {
+            console.error('Error creating file:', err);
+        } else {
+            console.log('File created successfully!');
+        }
+    });
+
+}
+ipcMain.on('openProfileWindow', (event, modify, name) => createProfileWindow(modify, name));
+ipcMain.on('createUpdateProfile', (event, name, mcversion, mctype, newname) => createUpdateProfile(name, mcversion, mctype, newname));
+ipcMain.on('deleteProfile', async (event, name) => { fs.rmSync(`${await getAppDataPath()}/.minecraft/Voxify/profiles/${name}`, { recursive: true }); });
+
+async function getProfileList() {
+    const profilePath = `${await getAppDataPath()}/.minecraft/Voxify/profiles`;
+    if (!fs.existsSync(profilePath)) return console.error('Profile folder not found');
+
+    const profiles = fs.readdirSync(profilePath);
+    return profiles;
+}
+
+ipcMain.handle('getProfileList', async () => { return await getProfileList(); });
 
 function createUpdater() {
     const win = new BrowserWindow({
@@ -119,7 +200,7 @@ function createWindow() {
         height: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            devTools: false
+            //devTools: false
         },
         icon: 'img/logo-crop.png',
         frame: false
@@ -174,7 +255,7 @@ app.whenReady().then(async () => {
         }
     } catch (e) {
         console.log('Error checking for updates');
-        updater.webContents.send('updateProcess', 'Error checking for updates ' + e);
+        updater.webContents.send('updateProcess', 'Error checking for updates');
         await wait(2000);
         updater.close();
     }
@@ -208,7 +289,13 @@ app.whenReady().then(async () => {
 
     ipcMain.on('minimize', () => win.minimize());
     ipcMain.on('maximize', () => win.isMaximized() ? win.unmaximize() : win.maximize());
-    ipcMain.on('close', () => win.close());
+    ipcMain.on('close', (event, windowLocation) => {
+        if (windowLocation.includes('index.html') || windowLocation.includes('login.html')) {
+            app.quit();
+        }
+    });
+    ipcMain.on('createUpdateProfile', () => { win.webContents.send('updateProfileList'); });
+    ipcMain.on('deleteProfile', () => { win.webContents.send('updateProfileList'); });
 
     ipcMain.handle('getUsername', async () => { return store.get('username') });
 

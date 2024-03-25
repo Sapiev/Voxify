@@ -2,3 +2,6 @@ node_modules
 dist
 LICENSE
 pnpm-lock.yaml
+nodemon.json
+yarn-error.log
+yarn.lock
