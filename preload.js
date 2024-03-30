@@ -1,4 +1,4 @@
-const APP_VERSION = "Beta 0.1.2";
+const APP_VERSION = "Beta 0.2.0";
 
 const { contextBridge, ipcRenderer } = require('electron')
 
@@ -14,7 +14,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openProfileWindow: (modify, name) => ipcRenderer.send('openProfileWindow', modify, name),
     createUpdateProfile: (name, mcversion, mctype, newname) => ipcRenderer.send('createUpdateProfile', name, mcversion, mctype, newname),
     deleteProfile: (name) => ipcRenderer.send('deleteProfile', name),
-    getProfileList: async () => await ipcRenderer.invoke('getProfileList')
+    getProfileList: async () => await ipcRenderer.invoke('getProfileList'),
+    getMinRam: async () => await ipcRenderer.invoke('getMinRam'),
+    getMaxRam: async () => await ipcRenderer.invoke('getMaxRam'),
+    getRam: async () => await ipcRenderer.invoke('getRam'),
+    setRam: (min, max) => ipcRenderer.send('setRam', min, max),
+    openSettingsWindow: () => ipcRenderer.send('openSettingsWindow'),
 })
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -26,8 +31,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const maximize = document.getElementById('maximize');
         const close = document.getElementById('close');
 
-        minimize.addEventListener('click', () => ipcRenderer.send('minimize'));
-        maximize.addEventListener('click', () => ipcRenderer.send('maximize'));
+        minimize.addEventListener('click', () => ipcRenderer.send('minimize', window.location.href));
+        maximize.addEventListener('click', () => ipcRenderer.send('maximize', window.location.href));
         close.addEventListener('click', () => ipcRenderer.send('close', window.location.href));
 
     } catch (e) {

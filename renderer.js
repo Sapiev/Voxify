@@ -6,6 +6,11 @@ const logoutBtn = document.getElementById('logout');
 const mainSettingContainer = document.getElementById('mainSettingContainer');
 const chooseProfile = document.getElementById('chooseProfile');
 const createProfile = document.getElementById('createProfile');
+const settings = document.getElementById('settings');
+
+settings.addEventListener('click', () => {
+    window.electronAPI.openSettingsWindow();
+});
 
 const minecraftTypeList = ['Vanilla', 'Fabric'];
 

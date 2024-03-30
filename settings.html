@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="settings.js"></script>
+    <link rel="stylesheet" href="bootstrap-icons/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="slider.css">
+</head>
+
+<body>
+    <div class="menu-bar">
+        <div style="width: 100%;">
+            <img src="img/logo.png">
+            Voxify
+            <span id="productVersion" style="font-size: 0.6rem; margin-left: 10px;">---</span>
+        </div>
+        <div>
+            <button id="minimize" class="icon pointer"><i class="bi bi-dash"></i></button>
+            <button id="maximize" class="icon pointer"><i class="bi bi-square"></i></button>
+            <button id="close" class="icon pointer"><i style="font-size: 1rem;" class="bi bi-x"></i></button>
+        </div>
+    </div>
+
+    <div class="range_container">
+        <div class="flex-center" style="flex-direction: column; padding-bottom: 30px;">
+            <p style="font-size: 1.2rem;">RAM Settings</p>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <p id="min">Min: 512</p>
+                <p id="max">Max: 1024</p>
+            </div>
+        </div>
+        <div class="sliders_control">
+            <input id="fromSlider" type="range" value="10" min="512" max="1024" />
+            <input id="toSlider" type="range" value="30" min="512" max="1024" />
+        </div>
+    </div>
+
+    <div style="position: absolute; bottom: 10px; left: 0; right: 0; margin: 0 auto; width: fit-content;">
+        <button id="save-settings" class="color">Save Settings</button>
+    </div>
+</body>
+
+</html>

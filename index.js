@@ -8,6 +8,10 @@ const launcher = new Client();
 const xmcl = require("@xmcl/installer");
 const xmclCore = require("@xmcl/core");
 const fs = require('fs');
+const os = require("os");
+
+let MINIMUM_RAM = store.get('minRam') || 1024;
+let MAXIMUM_RAM = store.get('maxRam') || 4096;
 
 const { autoUpdater, AppUpdater } = require("electron-updater")
 
@@ -28,8 +32,12 @@ async function getAppDataPath() {
 }
 
 async function installFabricLoader(version, path) {
-    const fabricVersionList = await xmcl.getFabricLoaderArtifact(version, '0.15.7');
+    const LOADER = '0.15.7'
+    const fabricVersionList = await xmcl.getFabricLoaderArtifact(version, LOADER);
     const fabricVersion = await xmcl.installFabric(fabricVersionList, path);
+
+    //fs.renameSync(`${path}/${fabricVersion}/${version}.json`, `${path}/${fabricVersion}/${fabricVersion}.json`);
+
     return fabricVersion;
 }
 
@@ -54,7 +62,7 @@ async function launchMinecraft(event, profile) {
     }
     var fabricVersion;
     if (mctype == "Fabric") {
-        fabricVersion = await installFabricLoader(mcversion, `${await getAppDataPath()}/.minecraft`);
+        fabricVersion = await installFabricLoader(mcversion, `${profilePath}/.minecraft`);
     }
     try {
         let opts;
@@ -68,8 +76,8 @@ async function launchMinecraft(event, profile) {
                     custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
                 memory: {
-                    max: "6G",
-                    min: "4G",
+                    max: MAXIMUM_RAM + "M",
+                    min: MINIMUM_RAM + "M",
                 },
                 overrides: {
                     detached: false
@@ -90,8 +98,8 @@ async function launchMinecraft(event, profile) {
                     custom: (mctype == "Fabric") ? fabricVersion : null,
                 },
                 memory: {
-                    max: "8G",
-                    min: "4G",
+                    max: MAXIMUM_RAM + "M",
+                    min: MINIMUM_RAM + "M",
                 },
                 overrides: {
                     detached: false
@@ -103,14 +111,56 @@ async function launchMinecraft(event, profile) {
     } catch (e) { console.error(e) }
 }
 
-async function createProfileWindow(modify, name) {
-    console.log(`Creating profile window, modify: ${modify}, name: ${name}`)
+// launcher.on('debug', (e) => console.log(e));
+// launcher.on('data', (e) => console.log(e));
+// launcher.on('error', (e) => console.error(e));
+// launcher.on('close', (e) => console.log(e));
+// launcher.on('progress', (e) => console.log(e));
+
+async function createSettingsWindow() {
     const win = new BrowserWindow({
         width: 400,
         height: 270,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             devTools: true
+        },
+        icon: 'img/logo-crop.png',
+        frame: false,
+        resizable: false
+    })
+    win.loadFile('settings.html');
+
+    ipcMain.on('close', (event, windowLocation) => { if (windowLocation.includes('settings.html')) win.destroy(); });
+    ipcMain.on('minimize', (event, windowLocation) => { if (windowLocation.includes('settings.html')) win.minimize() });
+    ipcMain.on('maximize', (event, windowLocation) => { if (windowLocation.includes('settings.html')) win.isMaximized() ? win.unmaximize() : win.maximize() });
+
+    ipcMain.on('setRam', (event) => {
+        win.destroy();
+    });
+
+    return win;
+}
+
+ipcMain.on('openSettingsWindow', () => createSettingsWindow());
+
+ipcMain.handle('getMinRam', async () => { return store.get('minRam') || 1024 });
+ipcMain.handle('getMaxRam', async () => { return store.get('maxRam') || 4096 });
+ipcMain.handle('getRam', async () => { return os.totalmem() });
+ipcMain.on('setRam', (event, min, max) => {
+    store.set('minRam', min);
+    store.set('maxRam', max);
+    MINIMUM_RAM = min;
+    MAXIMUM_RAM = max;
+});
+
+async function createProfileWindow(modify, name) {
+    const win = new BrowserWindow({
+        width: 400,
+        height: 270,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            devTools: false
         },
         icon: 'img/logo-crop.png',
         frame: false,
@@ -123,6 +173,9 @@ async function createProfileWindow(modify, name) {
             win.destroy();
         }
     });
+    ipcMain.on('minimize', (event, windowLocation) => { if (windowLocation.includes('create_profile.html')) win.minimize() });
+    ipcMain.on('maximize', (event, windowLocation) => { if (windowLocation.includes('create_profile.html')) win.isMaximized() ? win.unmaximize() : win.maximize() });
+
     ipcMain.on('createUpdateProfile', () => { win.destroy(); });
 
     if (modify) {
@@ -182,7 +235,7 @@ function createUpdater() {
         height: 300,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            devTools: true
+            devTools: false
         },
         resizable: true,
         icon: 'img/logo-crop.png',
@@ -200,7 +253,7 @@ function createWindow() {
         height: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            //devTools: false
+            devTools: false
         },
         icon: 'img/logo-crop.png',
         frame: false
@@ -235,12 +288,13 @@ app.whenReady().then(async () => {
         updater.close();
     });
     autoUpdater.on('download-progress', (progress) => {
-        updater.webContents.send('updateProcess', `Downloading... ${progress.percent}%`)
+        updater.webContents.send('updateProcess', `Downloading... ${progress.percent.toFixed(2)}%`)
     });
     autoUpdater.on('update-downloaded', async () => {
         updater.webContents.send('updateProcess', 'Update downloaded!');
         await wait(2000);
         updater.close();
+        autoUpdater.quitAndInstall();
     });
     autoUpdater.on('error', async (err) => {
         updater.webContents.send('updateProcess', 'Error updating');
@@ -287,12 +341,10 @@ app.whenReady().then(async () => {
         win.loadFile('login.html');
     });
 
-    ipcMain.on('minimize', () => win.minimize());
-    ipcMain.on('maximize', () => win.isMaximized() ? win.unmaximize() : win.maximize());
+    ipcMain.on('minimize', (event, windowLocation) => { if (windowLocation.includes('index.html') || windowLocation.includes('login.html')) win.minimize() });
+    ipcMain.on('maximize', (event, windowLocation) => { if (windowLocation.includes('index.html') || windowLocation.includes('login.html')) win.isMaximized() ? win.unmaximize() : win.maximize() });
     ipcMain.on('close', (event, windowLocation) => {
-        if (windowLocation.includes('index.html') || windowLocation.includes('login.html')) {
-            app.quit();
-        }
+        if (windowLocation.includes('index.html') || windowLocation.includes('login.html')) app.quit();
     });
     ipcMain.on('createUpdateProfile', () => { win.webContents.send('updateProfileList'); });
     ipcMain.on('deleteProfile', () => { win.webContents.send('updateProfileList'); });

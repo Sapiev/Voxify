@@ -5,3 +5,5 @@ pnpm-lock.yaml
 nodemon.json
 yarn-error.log
 yarn.lock
+CLIENT
+.gitignore
